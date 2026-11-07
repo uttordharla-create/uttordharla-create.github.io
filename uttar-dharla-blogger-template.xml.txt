@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html b:version='2' class='v2' expr:dir='data:blog.languageDirection' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<head>
+  <meta charset='utf-8'/>
+  <meta content='width=device-width,initial-scale=1' name='viewport'/>
+  <title><data:blog.pageTitle/></title>
+  <b:skin><![CDATA[
+  /* Uttar Dharla - Regional News Template */
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+  body{font-family:'Noto Sans Bengali', sans-serif; background:#f5f5f5; margin:0; color:#222}
+  a{color:#222; text-decoration:none}
+  .topbar{background:#111; color:#fff; font-size:13px; padding:6px 0}
+  .container{max-width:1180px; margin:0 auto; padding:0 15px}
+  .header{background:#fff; border-bottom:3px solid #d72027; padding:15px 0}
+  .logo{font-size:42px; font-weight:800; line-height:1}
+  .logo span{color:#d72027}
+  .tagline{font-size:14px; color:#666; margin-top:4px}
+  .nav{background:#d72027; color:#fff; position:sticky; top:0; z-index:99}
+  .nav ul{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap}
+  .nav li a{display:block; padding:12px 16px; color:#fff; font-weight:600; font-size:15px}
+  .nav li a:hover{background:#b51b20}
+  .breaking{background:#fff; border:1px solid #ddd; margin:15px 0; display:flex; align-items:center}
+  .breaking b{background:#d72027; color:#fff; padding:6px 12px; font-size:13px}
+  .main{display:grid; grid-template-columns: 2fr 1fr; gap:20px}
+  .lead{background:#fff; padding:15px; display:grid; grid-template-columns:1.2fr 1fr; gap:15px}
+  .lead img{width:100%; height:260px; object-fit:cover}
+  .lead h1{font-size:28px; margin:0 0 10px; line-height:1.3}
+  .side .box{background:#fff; padding:12px; margin-bottom:15px; border-top:3px solid #111}
+  .post-grid{display:grid; grid-template-columns: repeat(3,1fr); gap:15px; margin-top:20px}
+  .card{background:#fff; padding:10px}
+  .card img{width:100%; height:160px; object-fit:cover}
+  .card h3{font-size:17px; margin:8px 0}
+  .footer{background:#111; color:#aaa; padding:30px 0; margin-top:30px; text-align:center; font-size:14px}
+  @media(max-width:768px){.main,.lead,.post-grid{grid-template-columns:1fr}}
+  ]]></b:skin>
+</head>
+<body>
+  <div class='topbar'><div class='container'> <span id='bDate'/> | নাগেশ্বরী, কুড়িগ্রাম | ধরলা পাড়ের মুখপত্র</div></div>
+  <div class='header'><div class='container'>
+    <div class='logo'>উত্তর <span>ধরলা</span></div>
+    <div class='tagline'>ধরলা পাড়ের মুখপত্র - সত্যের সন্ধানে প্রতিদিন</div>
+  </div></div>
+  <div class='nav'><div class='container'><ul>
+    <li><a href='/'>সর্বশেষ</a></li>
+    <li><a href='/search/label/নাগেশ্বরী'>নাগেশ্বরী</a></li>
+    <li><a href='/search/label/ভূরুঙ্গামারী'>ভূরুঙ্গামারী</a></li>
+    <li><a href='/search/label/কুড়িগ্রাম'>কুড়িগ্রাম</a></li>
+    <li><a href='/search/label/ধরলা'>ধরলা</a></li>
+    <li><a href='/search/label/কৃষি'>কৃষি</a></li>
+    <li><a href='/search/label/সীমান্ত'>সীমান্ত</a></li>
+  </ul></div></div>
+
+  <div class='container'>
+    <div class='breaking'><b>শিরোনাম:</b><marquee> উত্তর ধরলায় আমন ধানের বাম্পার ফলন • ধরলা নদীতে পানি বৃদ্ধি • নাগেশ্বরী বাজারে ভোক্তা অধিকারের অভিযান </marquee></div>
+    
+    <b:section class='main' id='main' showaddelement='yes'>
+      <b:widget id='Blog1' locked='false' title='Blog Posts' type='Blog'>
+        <b:includable id='main'>
+          <div class='main'>
+            <div>
+              <b:loop values='data:posts' var='post'>
+                <div class='lead' style='margin-bottom:15px'>
+                  <b:if cond='data:post.firstImageUrl'><img expr:src='data:post.firstImageUrl'/><b:else/><img src='https://images.unsplash.com/photo-1504711434969-e33886168f5c'/></b:if>
+                  <div><h1><a expr:href='data:post.url'><data:post.title/></a></h1><p><data:post.snippet/></p></div>
+                </div>
+              </b:loop>
+            </div>
+            <div class='side'>
+              <div class='box'><h3>ফেসবুকে আমরা</h3><p>facebook.com/uttardharla - Like দিন</p></div>
+              <div class='box'><h3>সর্বাধিক পঠিত</h3><b:loop values='data:posts' var='post'><p>• <a expr:href='data:post.url'><data:post.title/></a></p></b:loop></div>
+            </div>
+          </div>
+        </b:includable>
+      </b:widget>
+    </b:section>
+
+    <div class='post-grid'>
+      <div class='card'><h3>এই টেমপ্লেটে আপনার সব পোস্ট অটো আসবে</h3><p>লেবেল দিয়ে আলাদা করুন: নাগেশ্বরী, ভূরুঙ্গামারী ইত্যাদি</p></div>
+    </div>
+  </div>
+
+  <div class='footer'>© 2026 উত্তর ধরলা | সম্পাদক: হাসান লিটন | নাগেশ্বরী, কুড়িগ্রাম<br/>যোগাযোগ: uttardharla@gmail.com</div>
+
+<script>document.getElementById('bDate').innerText = new Date().toLocaleDateString('bn-BD', {weekday:'long', year:'numeric', month:'long', day:'numeric'});</script>
+</body>
+</html>
