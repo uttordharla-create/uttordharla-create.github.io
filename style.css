@@ -116,3 +116,10 @@ details.cfg summary{cursor:pointer;font-weight:600}
   table.items td:first-child{font-weight:600;line-height:1.6}
   table.items td:last-child{margin-top:8px}
 }
+
+/* full-width article page */
+.cards.three{grid-template-columns:repeat(3,1fr)}
+@media(max-width:800px){.cards.three{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.cards.three{grid-template-columns:1fr}}
+article.full .body p{font-size:1.15rem;line-height:1.95}
+article.full h1{font-size:clamp(1.6rem,4.8vw,2.4rem)}

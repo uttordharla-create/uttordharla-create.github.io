@@ -10,12 +10,11 @@
 </head>
 <body>
 <main><div class="wrap">
-  <div class="grid">
-    <section id="art"></section>
-    <aside>
-      <div class="box"><h2 class="sec">আরও খবর</h2><ol class="list" id="more"></ol></div>
-    </aside>
-  </div>
+  <section id="art"></section>
+  <section id="moreBox" style="margin-top:28px;display:none">
+    <h2 class="sec">আরও খবর</h2>
+    <div class="cards three" id="more"></div>
+  </section>
 </div></main>
 <script src="app.js"></script>
 <script>
@@ -51,8 +50,8 @@
   art.append(share);
   box.append(art);
 
-  all.filter(x => x.id !== id).slice(0, 8).forEach(x =>
-    $("#more").append(el("li", {}, el("a", { href: "article.html?id=" + encodeURIComponent(x.id), text: x.title }))));
+  const others = all.filter(x => x.id !== id).slice(0, 6);
+  if (others.length) { $("#moreBox").style.display = "block"; others.forEach(x => $("#more").append(renderCard(x))); }
 })();
 </script>
 </body>
