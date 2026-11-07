@@ -5,7 +5,7 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);
-  font-family:"Noto Sans Bengali","Kalpurush","SolaimanLipi",system-ui,sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased}
+  font-family:"Hind Siliguri","Kalpurush","SolaimanLipi",system-ui,sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 img{max-width:100%}
 .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
@@ -107,3 +107,12 @@ table.items td:last-child{white-space:nowrap;text-align:right}
 details.cfg{margin-bottom:14px;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
 details.cfg summary{cursor:pointer;font-weight:600}
 @counter-style bengali{system:numeric;symbols:"০" "১" "২" "৩" "৪" "৫" "৬" "৭" "৮" "৯"}
+
+/* admin list on phones */
+@media(max-width:700px){
+  table.items,table.items tbody,table.items tr{display:block;width:100%}
+  table.items tr{padding:12px 0;border-bottom:1px solid var(--line)}
+  table.items td{display:block;border:0;padding:2px 0;text-align:left!important;white-space:normal!important}
+  table.items td:first-child{font-weight:600;line-height:1.6}
+  table.items td:last-child{margin-top:8px}
+}
