@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>অ্যাডমিন — উত্তর ধরলা</title>
+<link rel="icon" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main><div class="wrap">
+<div class="page form">
+  <h1>খবর যোগ করুন</h1>
+
+  <details class="cfg" id="cfg">
+    <summary>গিটহাব সংযোগ (একবার দিলেই হবে)</summary>
+    <label>গিটহাব ইউজারনেম</label><input type="text" id="owner" placeholder="যেমন: uttordharla">
+    <label>রিপোজিটরির নাম</label><input type="text" id="repo" placeholder="যেমন: uttordharla.github.io">
+    <label>ব্রাঞ্চ</label><input type="text" id="branch" value="main">
+    <label>অ্যাক্সেস টোকেন</label><input type="password" id="token" placeholder="github_pat_...">
+    <small>টোকেনটি শুধু এই ব্রাউজারেই সংরক্ষিত থাকে। অন্যের কম্পিউটারে ব্যবহার করলে শেষে "টোকেন মুছুন" চাপুন।</small>
+    <p><button class="btn" id="saveCfg" type="button">সংরক্ষণ ও যাচাই</button>
+       <button class="btn red" id="clearCfg" type="button">টোকেন মুছুন</button></p>
+  </details>
+
+  <div class="msg" id="msg"></div>
+
+  <form id="f">
+    <input type="hidden" id="editId">
+    <label>শিরোনাম *</label><input type="text" id="title" required>
+    <label>বিভাগ *</label><select id="category"></select>
+    <label>প্রতিবেদকের নাম</label><input type="text" id="author" value="নিজস্ব প্রতিবেদক">
+    <label>প্রকাশের সময়</label><input type="datetime-local" id="date" style="padding:10px 12px;border:1px solid #c5ccd6;border-radius:6px;font:inherit">
+    <label>ছবি (ঐচ্ছিক)</label><input type="file" id="image" accept="image/*">
+    <small id="imgNote"></small>
+    <label>সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)</label><input type="text" id="summary" placeholder="ফাঁকা রাখলে প্রথম অনুচ্ছেদ থেকে নেওয়া হবে">
+    <label>খবরের মূল লেখা *</label>
+    <textarea id="body" required></textarea>
+    <small>প্রতিটি অনুচ্ছেদের মাঝে একটি ফাঁকা লাইন রাখুন।</small>
+    <p style="margin-top:16px">
+      <button class="btn gold" id="pub" type="submit">প্রকাশ করুন</button>
+      <button class="btn" id="reset" type="button">নতুন করে শুরু</button>
+    </p>
+  </form>
+</div>
+
+<div class="page" style="margin-top:20px">
+  <h1 style="font-size:1.3rem">প্রকাশিত খবর</h1>
+  <button class="btn small" id="reload" type="button">তালিকা নতুন করে আনুন</button>
+  <table class="items" id="items" style="margin-top:10px"></table>
+</div>
+</div></main>
+
+<script src="app.js"></script>
+<script>
+layoutChrome("__admin");
+const KEY = "ud_admin_cfg";
+const cfg = () => JSON.parse(localStorage.getItem(KEY) || "{}");
+let newsCache = [];
+
+function msg(t, cls) { const m = $("#msg"); m.className = "msg " + cls; m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
+
+SITE.categories.forEach(c => $("#category").append(el("option", { value: c, text: c })));
+function nowLocal() { const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000); return d.toISOString().slice(0, 16); }
+$("#date").value = nowLocal();
+
+/* ---- config ---- */
+(function init() {
+  const c = cfg();
+  ["owner", "repo", "branch", "token"].forEach(k => { if (c[k]) $("#" + k).value = c[k]; });
+  if (c.author) $("#author").value = c.author;
+  if (!c.token) $("#cfg").open = true; else loadList();
+})();
+function readCfg() {
+  const c = { owner: $("#owner").value.trim(), repo: $("#repo").value.trim(), branch: $("#branch").value.trim() || "main", token: $("#token").value.trim() };
+  if (!c.owner || !c.repo || !c.token) throw new Error("গিটহাব ইউজারনেম, রিপোজিটরি ও টোকেন দিন।");
+  return c;
+}
+$("#saveCfg").onclick = async () => {
+  try {
+    const c = readCfg();
+    const r = await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}`, { headers: hdr(c) });
+    if (!r.ok) throw new Error("সংযোগ হয়নি (কোড " + r.status + ")। নাম ও টোকেন যাচাই করুন।");
+    localStorage.setItem(KEY, JSON.stringify({ ...cfg(), ...c }));
+    msg("সংযোগ সফল। এখন খবর প্রকাশ করতে পারবেন।", "ok");
+    $("#cfg").open = false; loadList();
+  } catch (e) { msg(e.message, "err"); }
+};
+$("#clearCfg").onclick = () => { const c = cfg(); delete c.token; localStorage.setItem(KEY, JSON.stringify(c)); $("#token").value = ""; msg("টোকেন মুছে ফেলা হয়েছে।", "info"); };
+
+/* ---- github helpers ---- */
+const hdr = c => ({ Authorization: "Bearer " + c.token, Accept: "application/vnd.github+json" });
+const enc = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(x => bin += String.fromCharCode(x)); return btoa(bin); };
+const dec = b64 => { const bin = atob(b64.replace(/\n/g, "")); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new TextDecoder().decode(u); };
+async function gh(c, path, opt = {}) {
+  const url = `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${path}` + (opt.method ? "" : `?ref=${c.branch}&t=${Date.now()}`);
+  const r = await fetch(url, { ...opt, headers: { ...hdr(c), "Content-Type": "application/json" } });
+  if (r.status === 404 && !opt.method) return null;
+  if (!r.ok) throw new Error("গিটহাব ত্রুটি " + r.status + (r.status === 401 || r.status === 403 ? " — টোকেনের অনুমতি (Contents: Read and write) যাচাই করুন।" : ""));
+  return r.json();
+}
+async function readNews(c) {
+  const f = await gh(c, "news.json");
+  if (!f) return { list: [], sha: undefined };
+  return { list: JSON.parse(dec(f.content)), sha: f.sha };
+}
+async function writeNews(c, list, sha, message) {
+  const body = { message, content: enc(JSON.stringify(list, null, 2) + "\n"), branch: c.branch };
+  if (sha) body.sha = sha;
+  await gh(c, "news.json", { method: "PUT", body: JSON.stringify(body) });
+}
+async function putImage(c, path, b64) {
+  const old = await gh(c, path);
+  const body = { message: "ছবি যোগ: " + path, content: b64, branch: c.branch };
+  if (old) body.sha = old.sha;
+  await gh(c, path, { method: "PUT", body: JSON.stringify(body) });
+}
+function resizeImage(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 1280, s = Math.min(1, max / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas");
+      cv.width = Math.round(img.width * s); cv.height = Math.round(img.height * s);
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(u);
+      res(cv.toDataURL("image/jpeg", 0.85).split(",")[1]);
+    };
+    img.onerror = () => rej(new Error("ছবিটি পড়া যায়নি।"));
+    img.src = u;
+  });
+}
+
+/* ---- publish ---- */
+$("#f").onsubmit = async e => {
+  e.preventDefault();
+  const btn = $("#pub"); btn.disabled = true;
+  try {
+    const c = readCfg();
+    msg("প্রকাশ করা হচ্ছে… একটু অপেক্ষা করুন।", "info");
+    const { list, sha } = await readNews(c);
+    const editId = $("#editId").value;
+    const existing = editId ? list.find(x => x.id === editId) : null;
+    const id = editId || "n" + Date.now().toString(36);
+    let image = existing ? existing.image : "";
+    const file = $("#image").files[0];
+    if (file) {
+      const path = "images/" + id + ".jpg";
+      await putImage(c, path, await resizeImage(file));
+      image = path;
+    }
+    const item = {
+      id, title: $("#title").value.trim(), category: $("#category").value,
+      author: $("#author").value.trim() || "নিজস্ব প্রতিবেদক",
+      date: new Date($("#date").value || Date.now()).toISOString(),
+      image, summary: $("#summary").value.trim(), body: $("#body").value.trim()
+    };
+    const next = existing ? list.map(x => x.id === id ? item : x) : [item, ...list];
+    await writeNews(c, next, sha, (existing ? "খবর সম্পাদনা: " : "নতুন খবর: ") + item.title);
+    localStorage.setItem(KEY, JSON.stringify({ ...cfg(), author: item.author }));
+    msg("সফলভাবে প্রকাশিত হয়েছে! সাইটে দেখা যেতে ১–২ মিনিট সময় লাগতে পারে।", "ok");
+    resetForm(); loadList();
+  } catch (err) { msg(err.message, "err"); }
+  btn.disabled = false;
+};
+function resetForm() {
+  $("#f").reset(); $("#editId").value = ""; $("#date").value = nowLocal();
+  $("#author").value = cfg().author || "নিজস্ব প্রতিবেদক"; $("#imgNote").textContent = ""; $("#pub").textContent = "প্রকাশ করুন";
+}
+$("#reset").onclick = resetForm;
+
+/* ---- list / edit / delete ---- */
+async function loadList() {
+  try {
+    const c = readCfg();
+    const { list } = await readNews(c);
+    newsCache = list.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const t = $("#items"); t.innerHTML = "";
+    if (!list.length) t.append(el("tr", {}, el("td", { text: "কোনো খবর নেই।" })));
+    list.forEach(n => {
+      const edit = el("button", { class: "btn small", type: "button", text: "সম্পাদনা" });
+      const del = el("button", { class: "btn small red", type: "button", text: "মুছুন" });
+      edit.onclick = () => startEdit(n.id);
+      del.onclick = () => removeItem(n.id);
+      t.append(el("tr", {}, el("td", { text: n.title }), el("td", { class: "meta", text: bnDate(n.date) }), el("td", {}, edit, " ", del)));
+    });
+  } catch (e) { /* কনফিগ না থাকলে চুপ */ }
+}
+$("#reload").onclick = loadList;
+function startEdit(id) {
+  const n = newsCache.find(x => x.id === id); if (!n) return;
+  $("#editId").value = n.id; $("#title").value = n.title; $("#category").value = n.category;
+  $("#author").value = n.author || ""; $("#summary").value = n.summary || ""; $("#body").value = n.body || "";
+  const d = new Date(new Date(n.date).getTime() - new Date().getTimezoneOffset() * 60000);
+  $("#date").value = d.toISOString().slice(0, 16);
+  $("#imgNote").textContent = n.image ? "বর্তমান ছবি থাকবে; নতুন ছবি বাছলে বদলে যাবে।" : "";
+  $("#pub").textContent = "পরিবর্তন সংরক্ষণ করুন";
+  msg("সম্পাদনা মোডে আছেন।", "info"); scrollTo({ top: 0, behavior: "smooth" });
+}
+async function removeItem(id) {
+  const n = newsCache.find(x => x.id === id); if (!n) return;
+  if (!confirm("এই খবরটি মুছে ফেলবেন?\n\n" + n.title)) return;
+  try {
+    const c = readCfg();
+    const { list, sha } = await readNews(c);
+    await writeNews(c, list.filter(x => x.id !== id), sha, "খবর মোছা: " + n.title);
+    msg("খবর মুছে ফেলা হয়েছে।", "ok"); loadList();
+  } catch (e) { msg(e.message, "err"); }
+}
+</script>
+</body>
+</html>

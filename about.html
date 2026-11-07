@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>আমাদের সম্পর্কে — উত্তর ধরলা</title>
+<link rel="icon" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main><div class="wrap">
+  <div class="page">
+    <h1>আমাদের সম্পর্কে</h1>
+    <p><b>উত্তর ধরলা</b> একটি অনলাইন সংবাদমাধ্যম। আমাদের অঙ্গীকার — <b>সৎ, বস্তুনিষ্ঠ ও নির্ভরযোগ্য</b> সংবাদ পাঠকের কাছে পৌঁছে দেওয়া। কুড়িগ্রাম ও নাগেশ্বরীর স্থানীয় খবর থেকে শুরু করে সারা দেশের গুরুত্বপূর্ণ ঘটনা আমরা তুলে ধরি।</p>
+    <table>
+      <tr><td>প্রকাশক</td><td id="pub"></td></tr>
+      <tr><td>সম্পাদক</td><td id="edt"></td></tr>
+      <tr><td>ঠিকানা</td><td id="adr"></td></tr>
+      <tr><td>ফোন/হোয়াটসঅ্যাপ</td><td id="ph"></td></tr>
+      <tr><td>ইমেইল</td><td id="em"></td></tr>
+      <tr><td>ফেসবুক</td><td id="fb"></td></tr>
+    </table>
+    <p style="margin-top:18px">খবর, প্রতিবাদ বা তথ্য পাঠাতে ইমেইল বা হোয়াটসঅ্যাপে যোগাযোগ করুন।</p>
+  </div>
+</div></main>
+<script src="app.js"></script>
+<script>
+layoutChrome("__about");
+$("#pub").textContent = SITE.publisher;
+$("#edt").textContent = SITE.editor;
+$("#adr").textContent = SITE.address;
+$("#ph").textContent = SITE.phone;
+$("#em").append(el("a", { href: "mailto:" + SITE.email, text: SITE.email }));
+$("#fb").append(el("a", { href: SITE.facebook, target: "_blank", rel: "noopener", text: "facebook.com/uttordharla" }));
+</script>
+</body>
+</html>

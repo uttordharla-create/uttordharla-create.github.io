@@ -1,0 +1,109 @@
+:root{
+  --navy:#14284b; --navy-d:#0c1a33; --gold:#d4af37; --gold-l:#f4e3a1;
+  --red:#c0392b; --bg:#f2f4f7; --card:#fff; --text:#1c232c; --muted:#5d6978; --line:#e0e5eb;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Noto Sans Bengali","Kalpurush","SolaimanLipi",system-ui,sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+
+/* header */
+.topline{background:var(--navy-d);color:#cdd7e6;font-size:.85rem}
+.topline .wrap{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:5px;padding-bottom:5px}
+header.site{background:#fff;border-bottom:1px solid var(--line)}
+.brandbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px;max-width:1100px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand img{height:88px;width:auto;display:block}
+.brand .fallback{font-family:"Noto Serif Bengali",serif;font-weight:700;font-size:2rem;color:var(--navy);line-height:1.1}
+.tagline{color:var(--muted);font-size:.95rem;font-weight:500}
+nav.main{background:var(--navy);border-bottom:4px solid var(--gold);position:sticky;top:0;z-index:20}
+nav.main .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav.main a{color:#fff;text-decoration:none;padding:10px 14px;white-space:nowrap;font-weight:500;font-size:.98rem}
+nav.main a:hover,nav.main a.on{background:var(--gold);color:var(--navy-d)}
+
+/* layout */
+main{padding:20px 0 40px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:22px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.brand img{height:64px}}
+.cat-tag{display:inline-block;background:var(--red);color:#fff;font-size:.78rem;font-weight:600;padding:0 10px;border-radius:3px;line-height:1.7}
+.meta{font-size:.85rem;color:var(--muted)}
+h2.sec{font-family:"Noto Serif Bengali",serif;font-size:1.3rem;margin:0 0 14px;padding-bottom:6px;border-bottom:3px solid var(--gold);color:var(--navy)}
+
+/* lead */
+.lead{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:22px}
+.lead a{text-decoration:none}
+.lead img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--line)}
+.lead .txt{padding:16px 18px 18px}
+.lead h1{font-family:"Noto Serif Bengali",serif;font-size:clamp(1.4rem,4vw,2rem);line-height:1.5;margin:8px 0}
+.lead p{margin:6px 0 8px;color:#39434f}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:560px){.cards{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card a{text-decoration:none;display:block;height:100%}
+.card img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:var(--line)}
+.card .txt{padding:12px 14px 14px}
+.card h3{font-family:"Noto Serif Bengali",serif;font-size:1.08rem;line-height:1.55;margin:6px 0}
+.card:hover h3,.lead:hover h1{color:var(--navy)}
+.card:hover{box-shadow:0 4px 14px rgba(20,40,75,.12)}
+
+/* sidebar */
+aside .box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.list{list-style:none;margin:0;padding:0;counter-reset:n}
+.list li{counter-increment:n;padding:9px 0 9px 36px;border-bottom:1px dashed var(--line);position:relative;line-height:1.6}
+.list li:last-child{border:0}
+.list li::before{content:counter(n,bengali);position:absolute;left:0;top:9px;width:26px;height:26px;border-radius:50%;background:var(--navy);color:var(--gold-l);font-size:.8rem;text-align:center;line-height:26px;font-weight:600}
+.list a{text-decoration:none;font-weight:500}
+.list a:hover{color:var(--navy);text-decoration:underline}
+
+/* article */
+article.full{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+article.full .head{padding:22px 22px 6px}
+article.full h1{font-family:"Noto Serif Bengali",serif;font-size:clamp(1.5rem,4.5vw,2.2rem);line-height:1.5;margin:10px 0}
+article.full .by{padding:10px 0 14px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.92rem;color:var(--muted)}
+article.full .by b{color:var(--text)}
+article.full figure{margin:0}
+article.full figure img{width:100%;display:block}
+.body{padding:6px 22px 20px}
+.body p{font-size:1.1rem;margin:16px 0}
+.share{display:flex;gap:8px;flex-wrap:wrap;padding:0 22px 22px}
+.btn{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;border:0;border-radius:6px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--navy-d)}
+.btn.gold{background:var(--gold);color:var(--navy-d)}
+.btn.red{background:var(--red)}
+.btn.small{padding:3px 10px;font-size:.85rem}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+
+/* pages */
+.page{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px}
+.page h1{font-family:"Noto Serif Bengali",serif;color:var(--navy);margin-top:0}
+.page table{border-collapse:collapse;width:100%}
+.page td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.page td:first-child{width:130px;color:var(--muted);font-weight:600}
+
+/* footer */
+footer.site{background:var(--navy-d);color:#c9d3e2;border-top:4px solid var(--gold);padding:26px 0;font-size:.92rem}
+footer.site .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+footer.site h4{color:var(--gold-l);margin:0 0 6px;font-family:"Noto Serif Bengali",serif}
+footer.site a{color:var(--gold-l)}
+footer .copy{margin-top:18px;padding-top:12px;border-top:1px solid #243452;text-align:center;font-size:.85rem}
+
+/* admin */
+.form label{display:block;font-weight:600;margin:14px 0 4px}
+.form input[type=text],.form input[type=password],.form select,.form textarea{width:100%;padding:10px 12px;border:1px solid #c5ccd6;border-radius:6px;font:inherit;background:#fff}
+.form textarea{min-height:260px;line-height:1.7}
+.form small{color:var(--muted)}
+.msg{padding:10px 14px;border-radius:6px;margin:12px 0;display:none}
+.msg.ok{background:#e6f5ea;color:#1c6b34;display:block}
+.msg.err{background:#fdeaea;color:#a02020;display:block}
+.msg.info{background:#eaf1fb;color:#1d4a85;display:block}
+table.items{width:100%;border-collapse:collapse}
+table.items td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.items td:last-child{white-space:nowrap;text-align:right}
+details.cfg{margin-bottom:14px;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+details.cfg summary{cursor:pointer;font-weight:600}
+@counter-style bengali{system:numeric;symbols:"০" "১" "২" "৩" "৪" "৫" "৬" "৭" "৮" "৯"}

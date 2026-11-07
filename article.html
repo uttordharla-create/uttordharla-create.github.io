@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>খবর — উত্তর ধরলা</title>
+<link rel="icon" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main><div class="wrap">
+  <div class="grid">
+    <section id="art"></section>
+    <aside>
+      <div class="box"><h2 class="sec">আরও খবর</h2><ol class="list" id="more"></ol></div>
+    </aside>
+  </div>
+</div></main>
+<script src="app.js"></script>
+<script>
+(async () => {
+  const id = new URLSearchParams(location.search).get("id");
+  const all = await loadNews();
+  const n = all.find(x => x.id === id);
+  layoutChrome(n ? n.category : null);
+  const box = $("#art");
+  if (!n) { box.append(el("div", { class: "empty", text: "দুঃখিত, খবরটি পাওয়া যায়নি।" })); return; }
+
+  document.title = n.title + " | উত্তর ধরলা";
+  const setMeta = (p, c) => { const m = document.createElement("meta"); m.setAttribute("property", p); m.content = c; document.head.append(m); };
+  setMeta("og:type", "article"); setMeta("og:title", n.title); setMeta("og:description", summaryOf(n));
+  if (n.image) setMeta("og:image", new URL(n.image, location.href).href);
+
+  const art = el("article", { class: "full" });
+  art.append(el("div", { class: "head" },
+    el("a", { href: "index.html?cat=" + encodeURIComponent(n.category), class: "cat-tag", text: n.category }),
+    el("h1", { text: n.title }),
+    el("div", { class: "by" },
+      el("span", {}, el("b", { text: n.author || "নিজস্ব প্রতিবেদক" })),
+      el("span", { text: "প্রকাশ: " + bnDate(n.date, true) }))));
+  if (n.image) { const f = el("figure"); f.append(imgTag(n.image, n.title)); art.append(f); }
+  const body = el("div", { class: "body" });
+  (n.body || "").split(/\n\s*\n/).filter(p => p.trim()).forEach(p => body.append(el("p", { text: p.trim() })));
+  art.append(body);
+
+  const url = encodeURIComponent(location.href);
+  const share = el("div", { class: "share" },
+    el("a", { class: "btn", target: "_blank", rel: "noopener", href: "https://www.facebook.com/sharer/sharer.php?u=" + url, text: "ফেসবুকে শেয়ার" }),
+    el("a", { class: "btn gold", target: "_blank", rel: "noopener", href: "https://wa.me/?text=" + encodeURIComponent(n.title + " " + location.href), text: "হোয়াটসঅ্যাপে শেয়ার" }));
+  art.append(share);
+  box.append(art);
+
+  all.filter(x => x.id !== id).slice(0, 8).forEach(x =>
+    $("#more").append(el("li", {}, el("a", { href: "article.html?id=" + encodeURIComponent(x.id), text: x.title }))));
+})();
+</script>
+</body>
+</html>
