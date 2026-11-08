@@ -5,7 +5,7 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);
-  font-family:"Hind Siliguri","Kalpurush","SolaimanLipi",system-ui,sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased}
+  font-family:"Noto Sans Bengali","Kalpurush","SolaimanLipi",system-ui,sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 img{max-width:100%}
 .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
@@ -123,3 +123,42 @@ details.cfg summary{cursor:pointer;font-weight:600}
 @media(max-width:560px){.cards.three{grid-template-columns:1fr}}
 article.full .body p{font-size:1.15rem;line-height:1.95}
 article.full h1{font-size:clamp(1.6rem,4.8vw,2.4rem)}
+
+/* ===== mobile-first polish ===== */
+html{-webkit-text-size-adjust:100%}
+h1,h2,h3,.card h3{overflow-wrap:anywhere}
+.body p{overflow-wrap:anywhere}
+@media(max-width:700px){
+  .topline .wrap span:last-child{display:none}
+  .topline .wrap{justify-content:center}
+  .brandbar{padding:8px 14px;flex-direction:column;align-items:flex-start;gap:2px}
+  .brand img{height:56px}
+  .tagline{font-size:.88rem}
+  nav.main a{padding:13px 14px;font-size:1rem}
+  main{padding:12px 0 28px}
+  .wrap{padding:0 12px}
+  .lead{margin-bottom:16px}
+  .lead .txt{padding:12px 14px 14px}
+  .lead h1{font-size:1.45rem;line-height:1.5}
+  .lead p{font-size:1rem}
+  h2.sec{font-size:1.15rem}
+  .card .txt{padding:10px 12px 12px}
+  .card h3{font-size:1.1rem}
+  aside .box{padding:12px 14px}
+  .list li{padding:10px 0 10px 36px}
+  article.full .head{padding:16px 14px 4px}
+  article.full h1{font-size:1.55rem;line-height:1.5}
+  article.full .by{font-size:.85rem}
+  .body{padding:4px 14px 16px}
+  article.full .body p{font-size:1.12rem;line-height:1.9;text-align:left}
+  .share{padding:0 14px 18px}
+  .share .btn{flex:1 1 140px;text-align:center;padding:11px 12px}
+  .page{padding:16px 14px}
+  .page td{display:block;width:auto!important;padding:2px 0}
+  .page td:first-child{padding-top:10px;font-size:.88rem}
+  footer.site{padding:20px 0}
+  /* admin */
+  .form input[type=text],.form input[type=password],.form select,.form textarea,.form input[type=datetime-local]{font-size:16px}
+  .form .btn{padding:12px 18px}
+  .btn.small{padding:7px 12px}
+}

@@ -2,11 +2,12 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14284b">
 <title>উত্তর ধরলা — সৎ বস্তুনিষ্ঠ ও নির্ভরযোগ্য</title>
 <meta name="description" content="উত্তর ধরলা: কুড়িগ্রাম ও নাগেশ্বরীসহ সারা দেশের সৎ, বস্তুনিষ্ঠ ও নির্ভরযোগ্য খবর।">
 <link rel="icon" href="logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -45,6 +46,7 @@
       el("div", { class: "meta", text: bnDate(f.date, true) + " · " + (f.author || "") })));
     $("#lead").append(el("div", { class: "lead" }, a));
     list.slice(1).forEach(n => $("#cards").append(renderCard(n)));
+    if (list.length <= 1 && !cat) $("#secTitle").style.display = "none";
   }
   all.slice(0, 8).forEach(n => $("#latest").append(el("li", {}, el("a", { href: "article.html?id=" + encodeURIComponent(n.id), text: n.title }))));
   SITE.categories.forEach(c => $("#cats").append(el("li", {}, el("a", { href: "index.html?cat=" + encodeURIComponent(c), text: c }))));
