@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#14284b">
 <title>উত্তর ধরলা — সৎ বস্তুনিষ্ঠ ও নির্ভরযোগ্য</title>
 <meta name="description" content="উত্তর ধরলা: কুড়িগ্রাম ও নাগেশ্বরীসহ সারা দেশের সৎ, বস্তুনিষ্ঠ ও নির্ভরযোগ্য খবর।">
+<link rel="canonical" href="https://uttordharla-create.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="উত্তর ধরলা">
+<meta property="og:title" content="উত্তর ধরলা — সৎ বস্তুনিষ্ঠ ও নির্ভরযোগ্য">
+<meta property="og:description" content="কুড়িগ্রাম ও নাগেশ্বরীসহ সারা দেশের সৎ, বস্তুনিষ্ঠ ও নির্ভরযোগ্য খবর।">
+<meta property="og:image" content="https://uttordharla-create.github.io/logo.png">
 <link rel="icon" href="logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -37,7 +43,7 @@
   if (!list.length) $("#empty").style.display = "block";
   else {
     const f = list[0];
-    const a = el("a", { href: "article.html?id=" + encodeURIComponent(f.id) });
+    const a = el("a", { href: articleUrl(f.id) });
     a.append(imgTag(f.image, f.title));
     a.append(el("div", { class: "txt" },
       el("span", { class: "cat-tag", text: f.category }),
@@ -48,7 +54,7 @@
     list.slice(1).forEach(n => $("#cards").append(renderCard(n)));
     if (list.length <= 1 && !cat) $("#secTitle").style.display = "none";
   }
-  all.slice(0, 8).forEach(n => $("#latest").append(el("li", {}, el("a", { href: "article.html?id=" + encodeURIComponent(n.id), text: n.title }))));
+  all.slice(0, 8).forEach(n => $("#latest").append(el("li", {}, el("a", { href: articleUrl(n.id), text: n.title }))));
   SITE.categories.forEach(c => $("#cats").append(el("li", {}, el("a", { href: "index.html?cat=" + encodeURIComponent(c), text: c }))));
 })();
 </script>
