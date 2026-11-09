@@ -6,8 +6,13 @@ const SITE = {
   phone: "01711579676",
   address: "পুরাতন থানাপাড়া, কুড়িগ্রাম ও সরকারি বালিকা বিদ্যালয় রোড, নাগেশ্বরী, কুড়িগ্রাম",
   facebook: "https://www.facebook.com/uttordharla",
-  publisher: "অ্যাডভোকেট জহুরুল হক",
-  editor: "মোঃ রাশেদুল হাসান",
+  // প্রকাশক ও সম্পাদক
+  team: [
+    { name: "মোঃ রাশেদুল হাসান", place: "নাগেশ্বরী, কুড়িগ্রাম" },
+    { name: "মোঃ মিজানুর রহমান মিজু", place: "সংযুক্ত আরব আমিরাত" },
+    { name: "মোঃ মাসুদ আলম", place: "নাগেশ্বরী, কুড়িগ্রাম" },
+    { name: "অ্যাডভোকেট জহুরুল হক", place: "টেক্সাস, ইউএসএ" }
+  ],
   categories: ["জাতীয়", "কুড়িগ্রাম", "অপরাধ", "রাজনীতি", "শিক্ষা", "খেলা", "মতামত", "অন্যান্য"]
 };
 
@@ -64,19 +69,24 @@ function layoutChrome(activeCat) {
   SITE.categories.forEach(c => link(c, "index.html?cat=" + encodeURIComponent(c), activeCat === c));
   link("আমাদের সম্পর্কে", "about.html", activeCat === "__about");
 
+  const teamHtml = SITE.team.map(p =>
+    `<div style="margin-bottom:6px"><b>${p.name}</b><br><span style="opacity:.8;font-size:.88em">${p.place}</span></div>`).join("");
+
   document.body.insertAdjacentHTML("beforeend", `
   <footer class="site"><div class="wrap">
     <div class="cols">
       <div><h4>${SITE.name}</h4>${SITE.tagline}</div>
       <div><h4>যোগাযোগ</h4>${SITE.address}<br>ফোন/হোয়াটসঅ্যাপ: ${SITE.phone}<br>ইমেইল: <a href="mailto:${SITE.email}">${SITE.email}</a></div>
-      <div><h4>পরিচালনা</h4>প্রকাশক: ${SITE.publisher}<br>সম্পাদক: ${SITE.editor}<br><a href="${SITE.facebook}" target="_blank" rel="noopener">ফেসবুক: uttordharla</a></div>
+      <div><h4>প্রকাশক ও সম্পাদক</h4>${teamHtml}<a href="${SITE.facebook}" target="_blank" rel="noopener">ফেসবুক: uttordharla</a></div>
     </div>
     <div class="copy">© ${new Date().getFullYear().toLocaleString("bn-BD",{useGrouping:false})} ${SITE.name} — সর্বস্বত্ব সংরক্ষিত</div>
   </div></footer>`);
 }
 
+function articleUrl(id) { return "news/" + encodeURIComponent(id) + ".html"; }
+
 function renderCard(n) {
-  const a = el("a", { href: "article.html?id=" + encodeURIComponent(n.id) });
+  const a = el("a", { href: articleUrl(n.id) });
   a.append(imgTag(n.image, n.title));
   const t = el("div", { class: "txt" },
     el("span", { class: "cat-tag", text: n.category || "অন্যান্য" }),
