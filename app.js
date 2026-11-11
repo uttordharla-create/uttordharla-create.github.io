@@ -120,16 +120,15 @@ function injectChromeCss() {
   const st = document.createElement("style");
   st.id = "chromeCss";
   st.textContent = `
-  :root{--logo-panel:rgba(255,255,255,.92);--logo-text:#14284b}
-  header.site.hero{position:relative;display:flex;align-items:center;justify-content:center;min-height:clamp(200px,34vw,360px);padding:16px 12px;overflow:hidden;background:#14284b}
+  header.site.hero{position:relative;display:flex;align-items:center;justify-content:center;min-height:clamp(120px,22vw,200px);padding:8px 12px;overflow:hidden;background:#14284b}
   .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,40,75,.15),rgba(20,40,75,.45))}
-  .hero-brand{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;
-    background:var(--logo-panel);padding:14px 30px 12px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);
-    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:92%}
-  .hero-logo{height:clamp(100px,17vw,170px);width:auto;max-width:100%;display:block}
-  .hero-fallback{font:700 clamp(26px,6vw,46px)/1.2 "Noto Serif Bengali",serif;color:var(--logo-text)}
-  .hero-tag{font-size:clamp(12px,2.4vw,15px);font-weight:600;color:#c8102e;letter-spacing:.3px}
+  .hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,30,60,.50),rgba(14,30,60,.62))}
+  .hero-brand{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;max-width:92%}
+  .hero-logo{height:clamp(72px,13vw,122px);width:auto;max-width:100%;display:block;
+    filter:brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0,0,0,.55))}
+  .hero-fallback{font:700 clamp(26px,6vw,44px)/1.2 "Noto Serif Bengali",serif;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+  .hero-tag{font-size:clamp(12px,2.2vw,15px);font-weight:600;color:#ffd24a;letter-spacing:.3px;text-shadow:0 1px 5px rgba(0,0,0,.7)}
+  @media (max-width:520px){.hero-tag{display:none}}
   .ticker{display:flex;align-items:stretch;background:#14284b;color:#fff;overflow:hidden}
   .ticker-label{background:#c8102e;padding:9px 14px;font-weight:700;white-space:nowrap;position:relative;z-index:1}
   .ticker-view{flex:1;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
