@@ -61,13 +61,14 @@ function layoutChrome(activeCat) {
   const today = new Date().toLocaleDateString("bn-BD", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
   const top = `
   <div class="topline"><div class="wrap"><span>${today}</span><span>${SITE.email} · ${SITE.phone}</span></div></div>
-  <header class="site"><div class="brandbar">
-    <a class="brand" href="index.html" aria-label="${SITE.name}">
-      <img src="logo.png" alt="${SITE.name}" onerror="this.outerHTML='<span class=&quot;fallback&quot;>${SITE.name}</span>'">
+  <header class="site hero">
+    <img class="hero-bg" src="header.webp" alt="" onerror="this.style.display='none'">
+    <div class="hero-shade"></div>
+    <a class="hero-brand" href="index.html" aria-label="${SITE.name}">
+      <img class="hero-logo" src="logo.png" alt="${SITE.name}" onerror="this.outerHTML='<span class=&quot;hero-fallback&quot;>${SITE.name}</span>'">
+      <span class="hero-tag">${SITE.tagline}</span>
     </a>
-    <div class="tagline">${SITE.tagline}</div>
-  </div>
-  <div class="hdr-banner"><img src="header.webp" alt="${SITE.name}" onerror="this.parentNode.style.display='none'"></div></header>
+  </header>
   <nav class="main"><div class="wrap" id="nav"></div></nav>
   <div class="ticker" id="ticker" style="display:none"><span class="ticker-label">সর্বশেষ</span><div class="ticker-view"><div class="ticker-track" id="tickerTrack"></div></div></div>`;
   injectChromeCss();
@@ -119,8 +120,16 @@ function injectChromeCss() {
   const st = document.createElement("style");
   st.id = "chromeCss";
   st.textContent = `
-  .hdr-banner{width:100%;line-height:0;background:#14284b}
-  .hdr-banner img{width:100%;height:clamp(100px,20vw,230px);object-fit:cover;display:block}
+  :root{--logo-panel:rgba(255,255,255,.92);--logo-text:#14284b}
+  header.site.hero{position:relative;display:flex;align-items:center;justify-content:center;min-height:clamp(200px,34vw,360px);padding:16px 12px;overflow:hidden;background:#14284b}
+  .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,40,75,.15),rgba(20,40,75,.45))}
+  .hero-brand{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;
+    background:var(--logo-panel);padding:14px 30px 12px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:92%}
+  .hero-logo{height:clamp(100px,17vw,170px);width:auto;max-width:100%;display:block}
+  .hero-fallback{font:700 clamp(26px,6vw,46px)/1.2 "Noto Serif Bengali",serif;color:var(--logo-text)}
+  .hero-tag{font-size:clamp(12px,2.4vw,15px);font-weight:600;color:#c8102e;letter-spacing:.3px}
   .ticker{display:flex;align-items:stretch;background:#14284b;color:#fff;overflow:hidden}
   .ticker-label{background:#c8102e;padding:9px 14px;font-weight:700;white-space:nowrap;position:relative;z-index:1}
   .ticker-view{flex:1;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
