@@ -132,13 +132,14 @@ function injectChromeCss() {
   .ticker{display:flex;align-items:stretch;background:#14284b;color:#fff;overflow:hidden}
   .ticker-label{background:#c8102e;padding:9px 14px;font-weight:700;white-space:nowrap;position:relative;z-index:1}
   .ticker-view{flex:1;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
-  .ticker-track{display:inline-flex;white-space:nowrap;animation:tickerMove var(--dur,40s) linear infinite}
-  .ticker-view:hover .ticker-track,.ticker-view:active .ticker-track{animation-play-state:paused}
+  .ticker-track{display:inline-flex;flex:none;white-space:nowrap;will-change:transform}
   .ticker-track a{color:#fff;text-decoration:none;padding:9px 0}
   .ticker-track a:hover{text-decoration:underline}
   .ticker-track .sep{padding:9px 16px;color:#f4c542}
-  @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  @media (prefers-reduced-motion:reduce){.ticker-track{animation:none;overflow-x:auto}}`;
+  article.full figure{margin:14px 0}
+  article.full figure img{width:100%;height:auto;display:block}
+  article.full figcaption{font-size:.9rem;line-height:1.55;color:#5d6978;padding:8px 2px 0;border-bottom:1px solid #e3e7ec;padding-bottom:10px}
+  `;
   document.head.append(st);
 }
 
@@ -147,12 +148,37 @@ async function initTicker() {
   if (!box || !track) return;
   const items = (await loadNews()).slice(0, 10);
   if (!items.length) return;
-  const build = () => items.forEach(n => {
+  const view = track.parentNode;
+  const addSet = () => items.forEach(n => {
     track.append(el("a", { href: articleUrl(n.id), text: n.title }));
     track.append(el("span", { class: "sep", text: "●" }));
   });
-  build(); build(); // দুইবার, যাতে স্ক্রল মসৃণভাবে ঘুরতে থাকে
-  const chars = items.reduce((t, n) => t + n.title.length + 3, 0);
-  track.style.setProperty("--dur", Math.max(20, Math.round(chars / 5)) + "s");
   box.style.display = "flex";
+  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+
+  addSet();
+  const setW = track.offsetWidth;
+  if (!setW) return;
+  // খবর কম হলে স্ক্রিন ভরানো পর্যন্ত পুনরাবৃত্তি
+  let reps = 1;
+  while (setW * reps < view.clientWidth && reps < 30) { addSet(); reps++; }
+  const cycle = setW * reps;
+  for (let i = 0; i < reps; i++) addSet(); // দ্বিতীয় কপি: মসৃণ ঘূর্ণনের জন্য
+
+  const SPEED = 55; // পিক্সেল/সেকেন্ড — বাড়ালে দ্রুত, কমালে ধীর
+  let x = 0, paused = false, last = performance.now();
+  const step = t => {
+    const dt = Math.min((t - last) / 1000, 0.1); last = t;
+    if (!paused) {
+      x -= SPEED * dt;
+      if (-x >= cycle) x += cycle;
+      track.style.transform = "translate3d(" + x + "px,0,0)";
+    }
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+  view.addEventListener("mouseenter", () => paused = true);
+  view.addEventListener("mouseleave", () => paused = false);
+  view.addEventListener("touchstart", () => paused = true, { passive: true });
+  view.addEventListener("touchend", () => setTimeout(() => paused = false, 1200), { passive: true });
 }

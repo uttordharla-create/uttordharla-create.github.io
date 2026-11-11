@@ -36,6 +36,8 @@
     <label>প্রকাশের সময়</label><input type="datetime-local" id="date" style="padding:10px 12px;border:1px solid #c5ccd6;border-radius:6px;font:inherit">
     <label>ছবি (ঐচ্ছিক)</label><input type="file" id="image" accept="image/*">
     <small id="imgNote"></small>
+    <label>ছবির ক্যাপশন (ঐচ্ছিক)</label><input type="text" id="imgCaption" placeholder="যেমন: ধরলা নদীর তীরে সকালের দৃশ্য। ছবি: নিজস্ব প্রতিবেদক">
+    <small>ছবি দিলে এই লেখাটি ছবির নিচে ছোট অক্ষরে দেখাবে।</small>
     <label>সংক্ষিপ্ত বিবরণ (ঐচ্ছিক)</label><input type="text" id="summary" placeholder="ফাঁকা রাখলে প্রথম অনুচ্ছেদ থেকে নেওয়া হবে">
     <label>খবরের মূল লেখা *</label>
     <textarea id="body" required></textarea>
@@ -176,7 +178,7 @@ function articleHtml(c, n) {
     mainEntityOfPage: url,
     publisher: { "@type": "Organization", name: SITE.name, logo: { "@type": "ImageObject", url: base + "logo.png" } }
   }).replace(/</g, "\\u003c");
-  const fig = n.image ? `<figure><img src="${esc(n.image)}" alt="${esc(n.title)}"></figure>` : "";
+  const fig = n.image ? `<figure><img src="${esc(n.image)}" alt="${esc(n.caption || n.title)}">${n.caption ? `<figcaption>${esc(n.caption)}</figcaption>` : ""}</figure>` : "";
   return `<!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -270,7 +272,7 @@ $("#f").onsubmit = async e => {
       id, title: $("#title").value.trim(), category: $("#category").value,
       author: $("#author").value.trim() || "নিজস্ব প্রতিবেদক",
       date: new Date($("#date").value || Date.now()).toISOString(),
-      image, summary: $("#summary").value.trim(), body: $("#body").value.trim()
+      image, caption: $("#imgCaption").value.trim(), summary: $("#summary").value.trim(), body: $("#body").value.trim()
     };
     const next = existing ? list.map(x => x.id === id ? item : x) : [item, ...list];
     await writeNews(c, next, sha, (existing ? "খবর সম্পাদনা: " : "নতুন খবর: ") + item.title);
@@ -328,7 +330,7 @@ $("#regen").onclick = async () => {
 function startEdit(id) {
   const n = newsCache.find(x => x.id === id); if (!n) return;
   $("#editId").value = n.id; $("#title").value = n.title; $("#category").value = normCat(n.category);
-  $("#author").value = n.author || ""; $("#summary").value = n.summary || ""; $("#body").value = n.body || "";
+  $("#author").value = n.author || ""; $("#summary").value = n.summary || ""; $("#imgCaption").value = n.caption || ""; $("#body").value = n.body || "";
   const d = new Date(new Date(n.date).getTime() - new Date().getTimezoneOffset() * 60000);
   $("#date").value = d.toISOString().slice(0, 16);
   $("#imgNote").textContent = n.image ? "বর্তমান ছবি থাকবে; নতুন ছবি বাছলে বদলে যাবে।" : "";
