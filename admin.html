@@ -327,7 +327,7 @@ $("#regen").onclick = async () => {
 
 function startEdit(id) {
   const n = newsCache.find(x => x.id === id); if (!n) return;
-  $("#editId").value = n.id; $("#title").value = n.title; $("#category").value = n.category;
+  $("#editId").value = n.id; $("#title").value = n.title; $("#category").value = normCat(n.category);
   $("#author").value = n.author || ""; $("#summary").value = n.summary || ""; $("#body").value = n.body || "";
   const d = new Date(new Date(n.date).getTime() - new Date().getTimezoneOffset() * 60000);
   $("#date").value = d.toISOString().slice(0, 16);

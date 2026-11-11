@@ -13,8 +13,12 @@ const SITE = {
     { name: "মোঃ মাসুদ আলম", place: "নাগেশ্বরী, কুড়িগ্রাম" },
     { name: "অ্যাডভোকেট জহুরুল হক", place: "টেক্সাস, ইউএসএ" }
   ],
-  categories: ["জাতীয়", "কুড়িগ্রাম", "অপরাধ", "রাজনীতি", "শিক্ষা", "খেলা", "মতামত", "অন্যান্য"]
+  categories: ["জাতীয়", "কুড়িগ্রাম", "অপরাধ", "সারাদেশ", "শিক্ষা", "খেলা", "মতামত", "অন্যান্য"]
 };
+
+// পুরোনো বিভাগের নাম নতুন নামে রূপান্তর (পুরোনো লিংক ও খবর যেন কাজ করে)
+const LEGACY_CATS = { "রাজনীতি": "সারাদেশ" };
+const normCat = c => (c && LEGACY_CATS[c]) || c;
 
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => {
@@ -41,6 +45,7 @@ async function loadNews() {
     const r = await fetch("news.json?t=" + Date.now());
     if (!r.ok) throw 0;
     const data = await r.json();
+    data.forEach(n => { n.category = normCat(n.category); });
     return data.sort((a, b) => new Date(b.date) - new Date(a.date));
   } catch (e) { return []; }
 }
@@ -52,6 +57,7 @@ function imgTag(src, alt) {
 }
 
 function layoutChrome(activeCat) {
+  activeCat = normCat(activeCat);
   const today = new Date().toLocaleDateString("bn-BD", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
   const top = `
   <div class="topline"><div class="wrap"><span>${today}</span><span>${SITE.email} · ${SITE.phone}</span></div></div>
@@ -60,14 +66,19 @@ function layoutChrome(activeCat) {
       <img src="logo.png" alt="${SITE.name}" onerror="this.outerHTML='<span class=&quot;fallback&quot;>${SITE.name}</span>'">
     </a>
     <div class="tagline">${SITE.tagline}</div>
-  </div></header>
-  <nav class="main"><div class="wrap" id="nav"></div></nav>`;
+  </div>
+  <div class="hdr-banner"><img src="header.webp" alt="${SITE.name}" onerror="this.parentNode.style.display='none'"></div></header>
+  <nav class="main"><div class="wrap" id="nav"></div></nav>
+  <div class="ticker" id="ticker" style="display:none"><span class="ticker-label">সর্বশেষ</span><div class="ticker-view"><div class="ticker-track" id="tickerTrack"></div></div></div>`;
+  injectChromeCss();
   document.body.insertAdjacentHTML("afterbegin", top);
   const nav = $("#nav");
   const link = (t, h, on) => nav.append(el("a", { href: h, class: on ? "on" : "", text: t }));
   link("প্রচ্ছদ", "index.html", !activeCat);
   SITE.categories.forEach(c => link(c, "index.html?cat=" + encodeURIComponent(c), activeCat === c));
   link("আমাদের সম্পর্কে", "about.html", activeCat === "__about");
+
+  initTicker();
 
   const teamHtml = SITE.team.map(p =>
     `<div style="margin-bottom:6px"><b>${p.name}</b><br><span style="opacity:.8;font-size:.88em">${p.place}</span></div>`).join("");
@@ -100,4 +111,40 @@ function summaryOf(n) {
   if (n.summary) return n.summary;
   const p = (n.body || "").split(/\n\s*\n/)[0] || "";
   return p.length > 180 ? p.slice(0, 180) + "…" : p;
+}
+
+/* ---- হেডার ব্যানার ও স্ক্রল নিউজ ---- */
+function injectChromeCss() {
+  if ($("#chromeCss")) return;
+  const st = document.createElement("style");
+  st.id = "chromeCss";
+  st.textContent = `
+  .hdr-banner{width:100%;line-height:0;background:#14284b}
+  .hdr-banner img{width:100%;height:clamp(100px,20vw,230px);object-fit:cover;display:block}
+  .ticker{display:flex;align-items:stretch;background:#14284b;color:#fff;overflow:hidden}
+  .ticker-label{background:#c8102e;padding:9px 14px;font-weight:700;white-space:nowrap;position:relative;z-index:1}
+  .ticker-view{flex:1;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+  .ticker-track{display:inline-flex;white-space:nowrap;animation:tickerMove var(--dur,40s) linear infinite}
+  .ticker-view:hover .ticker-track,.ticker-view:active .ticker-track{animation-play-state:paused}
+  .ticker-track a{color:#fff;text-decoration:none;padding:9px 0}
+  .ticker-track a:hover{text-decoration:underline}
+  .ticker-track .sep{padding:9px 16px;color:#f4c542}
+  @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media (prefers-reduced-motion:reduce){.ticker-track{animation:none;overflow-x:auto}}`;
+  document.head.append(st);
+}
+
+async function initTicker() {
+  const box = $("#ticker"), track = $("#tickerTrack");
+  if (!box || !track) return;
+  const items = (await loadNews()).slice(0, 10);
+  if (!items.length) return;
+  const build = () => items.forEach(n => {
+    track.append(el("a", { href: articleUrl(n.id), text: n.title }));
+    track.append(el("span", { class: "sep", text: "●" }));
+  });
+  build(); build(); // দুইবার, যাতে স্ক্রল মসৃণভাবে ঘুরতে থাকে
+  const chars = items.reduce((t, n) => t + n.title.length + 3, 0);
+  track.style.setProperty("--dur", Math.max(20, Math.round(chars / 5)) + "s");
+  box.style.display = "flex";
 }

@@ -34,7 +34,7 @@
 <script src="app.js"></script>
 <script>
 (async () => {
-  const cat = new URLSearchParams(location.search).get("cat");
+  const cat = normCat(new URLSearchParams(location.search).get("cat"));
   layoutChrome(cat);
   const all = await loadNews();
   const list = cat ? all.filter(n => n.category === cat) : all;
