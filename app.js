@@ -93,6 +93,8 @@ function layoutChrome(activeCat) {
     </div>
     <div class="copy">© ${new Date().getFullYear().toLocaleString("bn-BD",{useGrouping:false})} ${SITE.name} — সর্বস্বত্ব সংরক্ষিত</div>
   </div></footer>`);
+
+  addFollowCta(activeCat);
 }
 
 function articleUrl(id) { return "news/" + encodeURIComponent(id) + ".html"; }
@@ -181,4 +183,44 @@ async function initTicker() {
   view.addEventListener("mouseleave", () => paused = false);
   view.addEventListener("touchstart", () => paused = true, { passive: true });
   view.addEventListener("touchend", () => setTimeout(() => paused = false, 1200), { passive: true });
+}
+
+/* ---- ফেসবুক পেজ ফলো ও লাইক ---- */
+function addFollowCta(activeCat) {
+  if (activeCat === "__admin") return;
+  const fb = SITE.facebook;
+  const st = document.createElement("style");
+  st.textContent = `
+  .follow-box{margin:28px 0 8px;padding:16px;border:1px solid #e3e7ec;border-top:4px solid #1877f2;background:#f7f9fc;text-align:center}
+  .follow-box h3{margin:0 0 6px;font:700 1.15rem "Noto Serif Bengali",serif;color:#14284b}
+  .follow-box p{margin:0 0 12px;color:#5d6978;font-size:.95rem}
+  .follow-box iframe{border:0;max-width:100%}`;
+  document.head.append(st);
+
+  const box = document.createElement("div");
+  box.className = "follow-box";
+  box.innerHTML = `
+    <h3>আমাদের ফেসবুক পেজ ফলো করুন</h3>
+    <p>কুড়িগ্রাম ও নাগেশ্বরীর সর্বশেষ খবর সবার আগে পেতে।</p>
+    <iframe loading="lazy" width="340" height="130" scrolling="no"
+      src="https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(fb)}&tabs&width=340&height=130&small_header=true&hide_cover=true&show_facepile=true"></iframe>`;
+
+  const likeSrc = "https://www.facebook.com/plugins/like.php?href=" + encodeURIComponent(fb) +
+    "&layout=button_count&action=like&size=large&share=false&width=140&height=32";
+  const mkLike = () => {
+    const f = document.createElement("iframe");
+    f.src = likeSrc; f.width = 140; f.height = 32; f.scrolling = "no"; f.loading = "lazy";
+    f.style.cssText = "border:0;overflow:hidden;vertical-align:middle;margin-left:6px";
+    return f;
+  };
+  // খবরের শেয়ার বাটনের পাশে লাইক বাটন
+  const share = document.querySelector(".share");
+  if (share) share.append(mkLike());
+  // ফলো বক্সের ভেতরে লাইক বাটন
+  box.insertBefore(mkLike(), box.querySelector("iframe"));
+
+  // খবরের পেজে লেখার ঠিক নিচে, অন্য পেজে একদম নিচে
+  const art = document.querySelector("#art");
+  const wrap = document.querySelector("main .wrap");
+  if (art) art.after(box); else if (wrap) wrap.append(box);
 }
