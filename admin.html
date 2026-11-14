@@ -55,6 +55,18 @@
   <button class="btn small gold" id="regen" type="button">সব খবরের পেজ ও সাইটম্যাপ নতুন করে তৈরি</button>
   <table class="items" id="items" style="margin-top:10px"></table>
 </div>
+
+<div class="page form" style="margin-top:20px">
+  <h1 style="font-size:1.3rem">বিজ্ঞাপন (প্রতিটি খবরের শেষে দেখাবে)</h1>
+  <div class="msg" id="adMsg"></div>
+  <label>বিজ্ঞাপনের ছবি *</label><input type="file" id="adImage" accept="image/*">
+  <small>সেরা মাপ: ১২০০ × ৬০০ পিক্সেল (২:১)। JPG বা PNG, ২০০ কেবির কাছাকাছি হলে ভালো।</small>
+  <label>ক্লিক করলে যে লিংকে যাবে (ঐচ্ছিক)</label><input type="text" id="adLink" placeholder="https://...">
+  <label>নাম (শুধু আপনার চেনার জন্য, ঐচ্ছিক)</label><input type="text" id="adName" placeholder="যেমন: ABC ফার্মেসি">
+  <p style="margin-top:16px"><button class="btn gold" id="adAdd" type="button">বিজ্ঞাপন যোগ করুন</button></p>
+  <small>একাধিক বিজ্ঞাপন দিলে প্রতিটি খবরে একটি করে এলোমেলোভাবে দেখাবে। কোনো বিজ্ঞাপন না থাকলে কিছুই দেখাবে না।</small>
+  <table class="items" id="adItems" style="margin-top:10px"></table>
+</div>
 </div></main>
 
 <script src="app.js"></script>
@@ -75,7 +87,7 @@ $("#date").value = nowLocal();
   const c = cfg();
   ["owner", "repo", "branch", "token"].forEach(k => { if (c[k]) $("#" + k).value = c[k]; });
   if (c.author) $("#author").value = c.author;
-  if (!c.token) $("#cfg").open = true; else loadList();
+  if (!c.token) $("#cfg").open = true; else setTimeout(() => { loadList(); loadAds(); }, 0);
 })();
 function readCfg() {
   const c = { owner: $("#owner").value.trim(), repo: $("#repo").value.trim(), branch: $("#branch").value.trim() || "main", token: $("#token").value.trim() };
@@ -89,7 +101,7 @@ $("#saveCfg").onclick = async () => {
     if (!r.ok) throw new Error("সংযোগ হয়নি (কোড " + r.status + ")। নাম ও টোকেন যাচাই করুন।");
     localStorage.setItem(KEY, JSON.stringify({ ...cfg(), ...c }));
     msg("সংযোগ সফল। এখন খবর প্রকাশ করতে পারবেন।", "ok");
-    $("#cfg").open = false; loadList();
+    $("#cfg").open = false; loadList(); loadAds();
   } catch (e) { msg(e.message, "err"); }
 };
 $("#clearCfg").onclick = () => { const c = cfg(); delete c.token; localStorage.setItem(KEY, JSON.stringify(c)); $("#token").value = ""; msg("টোকেন মুছে ফেলা হয়েছে।", "info"); };
@@ -349,6 +361,64 @@ async function removeItem(id) {
     await putFile(c, "sitemap.xml", sitemapXml(c, next), "সাইটম্যাপ হালনাগাদ");
     msg("খবর মুছে ফেলা হয়েছে।", "ok"); loadList();
   } catch (e) { msg(e.message, "err"); }
+}
+/* ---- বিজ্ঞাপন ---- */
+function adMsg(t, cls) { const m = $("#adMsg"); m.className = "msg " + cls; m.textContent = t; }
+async function readAds(c) {
+  const f = await gh(c, "ads.json");
+  if (!f) return { list: [], sha: undefined };
+  return { list: JSON.parse(dec(f.content)), sha: f.sha };
+}
+async function writeAds(c, list, sha, message) {
+  const body = { message, content: enc(JSON.stringify(list, null, 2) + "\n"), branch: c.branch };
+  if (sha) body.sha = sha;
+  await gh(c, "ads.json", { method: "PUT", body: JSON.stringify(body) });
+}
+async function loadAds() {
+  try {
+    const c = readCfg();
+    const { list } = await readAds(c);
+    const t = $("#adItems"); t.innerHTML = "";
+    if (!list.length) t.append(el("tr", {}, el("td", { text: "কোনো বিজ্ঞাপন নেই।" })));
+    list.forEach(a => {
+      const img = el("img", { src: a.image, alt: "", style: "width:110px;height:auto;display:block;border:1px solid #e3e7ec" });
+      const del = el("button", { class: "btn small red", type: "button", text: "মুছুন" });
+      del.onclick = () => removeAd(a.id);
+      t.append(el("tr", {}, el("td", {}, img), el("td", { class: "meta", text: (a.name || "নামহীন") + (a.link ? " → " + a.link : "") }), el("td", {}, del)));
+    });
+  } catch (e) { /* কনফিগ না থাকলে চুপ */ }
+}
+$("#adAdd").onclick = async () => {
+  const b = $("#adAdd"); b.disabled = true;
+  try {
+    const c = readCfg();
+    const file = $("#adImage").files[0];
+    if (!file) throw new Error("বিজ্ঞাপনের ছবি বাছুন।");
+    let link = $("#adLink").value.trim();
+    if (link && !/^https?:\/\//i.test(link)) link = "https://" + link;
+    const name = $("#adName").value.trim();
+    adMsg("বিজ্ঞাপন যোগ করা হচ্ছে… একটু অপেক্ষা করুন।", "info");
+    const id = "a" + Date.now().toString(36);
+    const path = "ads/" + id + ".jpg";
+    await putImage(c, path, await resizeImage(file));
+    const { list, sha } = await readAds(c);
+    await writeAds(c, [...list, { id, image: path, link, name }], sha, "নতুন বিজ্ঞাপন: " + (name || id));
+    $("#adImage").value = ""; $("#adLink").value = ""; $("#adName").value = "";
+    adMsg("বিজ্ঞাপন যোগ হয়েছে! সাইটে দেখা যেতে ১–২ মিনিট সময় লাগতে পারে।", "ok");
+    loadAds();
+  } catch (e) { adMsg(e.message, "err"); }
+  b.disabled = false;
+};
+async function removeAd(id) {
+  if (!confirm("এই বিজ্ঞাপনটি মুছে ফেলবেন?")) return;
+  try {
+    const c = readCfg();
+    const { list, sha } = await readAds(c);
+    const ad = list.find(x => x.id === id);
+    await writeAds(c, list.filter(x => x.id !== id), sha, "বিজ্ঞাপন মোছা: " + id);
+    if (ad && ad.image) await delFile(c, ad.image, "বিজ্ঞাপনের ছবি মোছা: " + id);
+    adMsg("বিজ্ঞাপন মুছে ফেলা হয়েছে।", "ok"); loadAds();
+  } catch (e) { adMsg(e.message, "err"); }
 }
 </script>
 </body>
